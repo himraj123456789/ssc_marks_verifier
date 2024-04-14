@@ -8,10 +8,10 @@ import requests
 #URL ="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S24D305873/16552731167542966/3201602995_2207O2258S24D305873E1.html#"
 #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S24D305873/16552731127036548/3201603059_2207O2258S24D305873E1.html"
 #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S12D237246/16552735052315268/3201601766_2207O2258S12D237246E1.html"
-URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S52D342010/16552561125634920/3201007443_2207O2258S52D342010E1.html"
-
+#URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S52D342010/16552561125634920/3201007443_2207O2258S52D342010E1.html"
+URL = st.text_input("Enter The URL", "")
 r = requests.get(URL)
- 
+
 soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
 
 counter=0
