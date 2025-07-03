@@ -2,3 +2,4 @@ streamlit
 pdfplumber
 pandas
 beautifulsoup4
+html5lib
