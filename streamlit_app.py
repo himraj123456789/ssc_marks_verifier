@@ -17,7 +17,7 @@ def process_url(url):
     r = requests.get(url)
      
     soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-
+    st.write(soup)
 
 
     # Find all <td> elements with class "bold"
