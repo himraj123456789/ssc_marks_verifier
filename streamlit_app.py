@@ -1,53 +1,62 @@
 import streamlit as st
-import pdfplumber
-import re
-import pandas as pd
-import io
-
 from bs4 import BeautifulSoup
 import requests
-st.title("📄 UGC-NET PDF to DataFrame Converter + Text Echo")
 
-# --- Step 1: File uploader ---
-uploaded_file = st.file_uploader("Upload UGC-NET Answer Key PDF", type="pdf")
+st.title("SSC Answers Checker")
 
-# --- Step 2: Simple text input ---
-user_text = st.text_input("Enter any text you want (optional)")
+# Input URL from user
+url = st.text_input("Enter the URL of the response page:")
 
-# --- Step 3: Button to trigger extraction ---
-if st.button("🔍 Extract Data and Show Text"):
-    st.text_area("You Entered:", user_text)
-    URL = user_text
-    r = requests.get(URL)
+if url:
+    try:
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content, 'html5lib')
 
-    soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-    print(soup)
-    if uploaded_file is not None:
-        pdf_bytes = uploaded_file.read()
-        extracted_data = []
+        bold_tds = soup.find_all('td', class_='bold')
 
-        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-            total_pages = len(pdf.pages)
-            st.info(f"Total Pages in PDF: {total_pages}")
+        question = []
+        answer = []
+        printer = 0
+        printer_ans = 0
 
-            # --- Extract text from all pages ---
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    # Extract Question ID and Option (1–4)
-                    page_data = re.findall(r'(\d{6,20})\s+([1-4])', text)
-                    extracted_data.extend(page_data)
+        for td in bold_tds:
+            val = td.get_text(strip=True)
+            if printer_ans == 1:
+                answer.append(str(val))
+                printer_ans = 0
+            if printer == 1:
+                question.append(str(val))
+                printer = 0
+            if val == 'MCQ':
+                printer = 1
+            if val == 'Answered':
+                printer_ans = 1
 
-        # --- Show result in DataFrame ---
-        if extracted_data:
-            df = pd.DataFrame(extracted_data, columns=["Question ID", "Correct Option"])
-            st.success(f"✅ Extracted {len(df)} rows.")
-            st.dataframe(df)
+        data_user = {}
+        for i in range(len(answer)):
+            data_user[question[i]] = answer[i]
 
-            # Download option
-            csv = df.to_csv(index=False).encode('utf-8')
-            st.download_button("📥 Download as CSV", data=csv, file_name="ugc_net_answerkey.csv", mime='text/csv')
-        else:
-            st.warning("⚠️ No valid data found in the uploaded PDF.")
-    else:
-        st.warning("⚠️ Please upload a PDF file first.")
+        # Paste your actual answer dict here
+      
+actual_answer={'4255894905': '2', '4255894906': '4', '4255894907': '1', '4255894908': '3', '4255894909': '2', '4255894910': '1', '4255894911': '2', '4255894912': '2', '4255894913': '3', '4255894914': '3', '4255894915': '2', '4255894916': '3', '4255894917': '2', '4255894918': '3', '4255894919': '3', '4255894920': '1', '4255894921': '2', '4255894922': '2', '4255894923': '1', '4255894924': '3', '4255894925': '1', '4255894926': '1', '4255894927': '1', '4255894928': '2', '4255894929': '1', '4255894930': '3', '4255894931': '2', '4255894932': '1', '4255894933': '4', '4255894934': '3', '4255894935': '1', '4255894936': '2', '4255894937': '3', '4255894938': '4', '4255894939': '3', '4255894940': '4', '4255894941': '3', '4255894942': '4', '4255894943': '4', '4255894944': '4', '4255894945': '3', '4255894946': '2', '4255894947': '1', '4255894948': '4', '4255894949': '4', '4255894951': '3', '4255894952': '3', '4255894953': '1', '4255894954': '4', '4255894955': '3', '4255894956': '2', '4255894957': '3', '4255894958': '2', '4255894959': '4', '4255894960': '1', '4255894961': '3', '4255894962': '2', '4255894963': '3', '4255894964': '2', '4255894965': '2', '4255894966': '3', '4255894967': '1', '4255894968': '4', '4255894969': '2', '4255894970': '3', '4255894971': '1', '4255894972': '1', '4255894973': '4', '4255894974': '3', '4255894975': '2', '4255894976': '1', '4255894977': '4', '4255894978': '1', '4255894979': '3', '4255894980': '4', '4255894981': '4', '4255894982': '3', '4255894983': '3', '4255894984': '4', '4255894985': '2', '4255894986': '4', '4255894987': '4', '4255894988': '3', '4255894989': '1', '4255894990': '3', '4255894991': '3', '4255894992': '3', '4255894993': '1', '4255894994': '1', '4255894995': '1', '4255894996': '3', '4255894997': '1', '4255894998': '3', '4255894999': '3', '4255895000': '4', '4255895001': '3', '4255895002': '3', '4255895003': '2', '4255895004': '3', '4255895005': '4', '4255895006': '3', '4255895007': '4', '4255895008': '2', '4255895009': '1', '4255895010': '2', '4255895011': '3', '4255895012': '1', '4255895013': '3', '4255895014': '4', '4255895015': '3', '4255895016': '4', '4255895017': '4', '4255895018': '1', '4255895019': '2', '4255895020': '4', '4255895021': '2', '4255895022': '4', '4255895023': '2', '4255895024': '4', '4255895025': '3', '4255895026': '2', '4255895027': '2', '4255895028': '3', '4255895029': '2', '4255895030': '3', '4255895031': '3', '4255895032': '3', '4255895033': '1', '4255895034': '3', '4255895035': '2', '4255895036': '2', '4255895037': '1', '4255895038': '2', '4255895039': '1', '4255895040': '2', '4255895041': '3', '4255895042': '2', '4255895043': '2', '4255895044': '3', '4255895045': '1', '4255895047': '4', '4255895048': '4', '4255895049': '1', '4255895050': '1', '4255895051': '3', '4255895053': '3', '4255895054': '3', '4255895055': '3', '4255895056': '4', '4255895057': '1'}
+
+
+
+
+
+
+
+
+
+
+
+        marks = 0
+        for q_id, user_ans in data_user.items():
+            correct_ans = actual_answer.get(q_id)
+            if correct_ans == user_ans:
+                marks += 2
+
+        st.success(f"Total marks: {marks}")
+
+    except Exception as e:
+        st.error(f"Error fetching or processing URL: {e}")
