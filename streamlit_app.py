@@ -67,6 +67,7 @@ def process_url(url):
         given_answer_get  = data_user[str(question_id_get)]
         if(actual_answer_get ==given_answer_get):
             marks = marks+2
+    st.write(marks)
     return str(marks)
     
       #change code little bit where user give the url and then marks calculate
