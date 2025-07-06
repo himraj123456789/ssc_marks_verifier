@@ -14,7 +14,7 @@ def process_url(url):
 
     #URL ="https://cdn3.digialm.com//per/g28/pub/2083/touchstone/AssessmentQPHTMLMode1//2083O25230/2083O25230S5D1842/17512718854284139/BR08001231_2083O25230S5D1842E1.html"
 
-    r = requests.get(URL)
+    r = requests.get(url)
      
     soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
 
