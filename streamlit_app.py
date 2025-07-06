@@ -12,7 +12,7 @@ def process_url(url):
     #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S12D237246/16552735052315268/3201601766_2207O2258S12D237246E1.html"
     #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S52D342010/16552561125634920/3201007443_2207O2258S52D342010E1.html"
 
-    URL ="https://cdn3.digialm.com//per/g28/pub/2083/touchstone/AssessmentQPHTMLMode1//2083O25230/2083O25230S5D1842/17512718854284139/BR08001231_2083O25230S5D1842E1.html"
+    #URL ="https://cdn3.digialm.com//per/g28/pub/2083/touchstone/AssessmentQPHTMLMode1//2083O25230/2083O25230S5D1842/17512718854284139/BR08001231_2083O25230S5D1842E1.html"
 
     r = requests.get(URL)
      
@@ -67,8 +67,8 @@ def process_url(url):
         given_answer_get  = data_user[str(question_id_get)]
         if(actual_answer_get ==given_answer_get):
             marks = marks+2
-    return marks 
-
+    return str(marks)
+    
       #change code little bit where user give the url and then marks calculate
 
 
