@@ -81,6 +81,6 @@ if st.button("Process URL"):
     if url_input:
         result = process_url(url_input)
         st.success("Total marks is :")
-        st.success(result)
+        st.write(result)
     else:
         st.error("Please enter a URL")
