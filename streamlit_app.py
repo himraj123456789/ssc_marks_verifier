@@ -13,8 +13,12 @@ def process_url(url):
     #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S52D342010/16552561125634920/3201007443_2207O2258S52D342010E1.html"
 
     #URL ="https://cdn3.digialm.com//per/g28/pub/2083/touchstone/AssessmentQPHTMLMode1//2083O25230/2083O25230S5D1842/17512718854284139/BR08001231_2083O25230S5D1842E1.html"
+    headers = {
+        
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36'
+     }
 
-    r = requests.get(url)
+    r= requests.get(url, headers=headers)
      
     soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
     st.write(soup)
