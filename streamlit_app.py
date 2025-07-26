@@ -1,91 +1,40 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
+# GitHub CSV URL
+csv_url = "https://raw.githubusercontent.com/himraj123456789/saurav/main/hhh.csv"
 
-from bs4 import BeautifulSoup
-import requests
-def process_url(url):
-    
-    
+st.title("PCA Image Reconstruction")
 
-    #URL ="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S24D305873/16552731167542966/3201602995_2207O2258S24D305873E1.html#"
-    #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S24D305873/16552731127036548/3201603059_2207O2258S24D305873E1.html"
-    #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S12D237246/16552735052315268/3201601766_2207O2258S12D237246E1.html"
-    #URL="https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O2258/2207O2258S52D342010/16552561125634920/3201007443_2207O2258S52D342010E1.html"
+# Load CSV into DataFrame (assuming no header)
+df = pd.read_csv(csv_url, header=None)
+loaded_array = df.to_numpy()
 
-    #URL ="https://cdn3.digialm.com//per/g28/pub/2083/touchstone/AssessmentQPHTMLMode1//2083O25230/2083O25230S5D1842/17512718854284139/BR08001231_2083O25230S5D1842E1.html"
-    headers = {
-        
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36'
-     }
+st.write(f"Original data shape: {loaded_array.shape}")
 
-    r= requests.get(url, headers=headers)
-     
-    soup = BeautifulSoup(r.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-    
+# Input PCA components
+n_components = st.number_input(
+    "Enter number of PCA components", min_value=1, max_value=min(loaded_array.shape), value=30, step=1
+)
 
+if st.button("Apply PCA"):
+    # Apply PCA
+    pca = PCA(n_components=n_components)
+    transformed = pca.fit_transform(loaded_array)
+    reconstructed = pca.inverse_transform(transformed)
 
-    # Find all <td> elements with class "bold"
-    bold_tds = soup.find_all('td', class_='bold')
-    counter =0
-    printer = 0
-    printer_ans =0
-    question =[]
-    answer = []
-    # Print the text of each <td class="bold">
-    for td in bold_tds:
-        val = td.get_text(strip=True)
-        if(printer_ans==1):
-            answer.append(str(val))
-            printer_ans =0
-        if(printer==1):
-            question.append(str(val))
-            printer = 0 
-        if(val =='MCQ'):
-            printer =1 
-        if(val == 'Answered'):
-            
-            printer_ans =1
+    # Plotting
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 
-        counter =counter +1
+    axs[0].imshow(loaded_array, cmap='gray')
+    axs[0].set_title("Original")
+    axs[0].axis('off')
 
-        
+    axs[1].imshow(reconstructed, cmap='gray')
+    axs[1].set_title(f"Reconstructed with {n_components} components")
+    axs[1].axis('off')
 
-    data_user ={}
-    for i in range(0,len(answer)):
-        data_user[question[i]]= answer[i]
-
-
-    # actual answer
-
-    actual_answer={'4255894905': '2', '4255894906': '4', '4255894907': '1', '4255894908': '3', '4255894909': '2', '4255894910': '1', '4255894911': '2', '4255894912': '2', '4255894913': '3', '4255894914': '3', '4255894915': '2', '4255894916': '3', '4255894917': '2', '4255894918': '3', '4255894919': '3', '4255894920': '1', '4255894921': '2', '4255894922': '2', '4255894923': '1', '4255894924': '3', '4255894925': '1', '4255894926': '1', '4255894927': '1', '4255894928': '2', '4255894929': '1', '4255894930': '3', '4255894931': '2', '4255894932': '1', '4255894933': '4', '4255894934': '3', '4255894935': '1', '4255894936': '2', '4255894937': '3', '4255894938': '4', '4255894939': '3', '4255894940': '4', '4255894941': '3', '4255894942': '4', '4255894943': '4', '4255894944': '4', '4255894945': '3', '4255894946': '2', '4255894947': '1', '4255894948': '4', '4255894949': '4', '4255894951': '3', '4255894952': '3', '4255894953': '1', '4255894954': '4', '4255894955': '3', '4255894956': '2', '4255894957': '3', '4255894958': '2', '4255894959': '4', '4255894960': '1', '4255894961': '3', '4255894962': '2', '4255894963': '3', '4255894964': '2', '4255894965': '2', '4255894966': '3', '4255894967': '1', '4255894968': '4', '4255894969': '2', '4255894970': '3', '4255894971': '1', '4255894972': '1', '4255894973': '4', '4255894974': '3', '4255894975': '2', '4255894976': '1', '4255894977': '4', '4255894978': '1', '4255894979': '3', '4255894980': '4', '4255894981': '4', '4255894982': '3', '4255894983': '3', '4255894984': '4', '4255894985': '2', '4255894986': '4', '4255894987': '4', '4255894988': '3', '4255894989': '1', '4255894990': '3', '4255894991': '3', '4255894992': '3', '4255894993': '1', '4255894994': '1', '4255894995': '1', '4255894996': '3', '4255894997': '1', '4255894998': '3', '4255894999': '3', '4255895000': '4', '4255895001': '3', '4255895002': '3', '4255895003': '2', '4255895004': '3', '4255895005': '4', '4255895006': '3', '4255895007': '4', '4255895008': '2', '4255895009': '1', '4255895010': '2', '4255895011': '3', '4255895012': '1', '4255895013': '3', '4255895014': '4', '4255895015': '3', '4255895016': '4', '4255895017': '4', '4255895018': '1', '4255895019': '2', '4255895020': '4', '4255895021': '2', '4255895022': '4', '4255895023': '2', '4255895024': '4', '4255895025': '3', '4255895026': '2', '4255895027': '2', '4255895028': '3', '4255895029': '2', '4255895030': '3', '4255895031': '3', '4255895032': '3', '4255895033': '1', '4255895034': '3', '4255895035': '2', '4255895036': '2', '4255895037': '1', '4255895038': '2', '4255895039': '1', '4255895040': '2', '4255895041': '3', '4255895042': '2', '4255895043': '2', '4255895044': '3', '4255895045': '1', '4255895047': '4', '4255895048': '4', '4255895049': '1', '4255895050': '1', '4255895051': '3', '4255895053': '3', '4255895054': '3', '4255895055': '3', '4255895056': '4', '4255895057': '1'}
-
-
-
-    # match the answer
-
-    marks = 0
-    for i in range(0,len(answer)):
-
-        question_id_get = question[i]
-        actual_answer_get = actual_answer[str(question_id_get)]
-        given_answer_get  = data_user[str(question_id_get)]
-        if(actual_answer_get ==given_answer_get):
-            marks = marks+2
-    st.write(marks)
-    return str(marks)
-    
-      #change code little bit where user give the url and then marks calculate
-
-
-
-st.title("UGC marks add ")
-
-url_input = st.text_input("Enter the URL")
-
-if st.button("Process URL"):
-    if url_input:
-        result = process_url(url_input)
-        st.success("Total marks is :")
-        st.write(result)
-    else:
-        st.error("Please enter a URL")
+    st.pyplot(fig)
