@@ -15,26 +15,35 @@ loaded_array = df.to_numpy()
 
 st.write(f"Original data shape: {loaded_array.shape}")
 
-# Input PCA components
-n_components = st.number_input(
-    "Enter number of PCA components", min_value=1, max_value=min(loaded_array.shape), value=30, step=1
+# Use text input to enter PCA components (no plus/minus buttons)
+n_components_str = st.text_input(
+    "Enter number of PCA components (integer)", value="30"
 )
 
 if st.button("Apply PCA"):
-    # Apply PCA
-    pca = PCA(n_components=n_components)
-    transformed = pca.fit_transform(loaded_array)
-    reconstructed = pca.inverse_transform(transformed)
+    # Validate input
+    if not n_components_str.isdigit():
+        st.error("Please enter a valid positive integer for PCA components.")
+    else:
+        n_components = int(n_components_str)
+        max_components = min(loaded_array.shape)
+        if n_components < 1 or n_components > max_components:
+            st.error(f"Component number must be between 1 and {max_components}")
+        else:
+            # Apply PCA
+            pca = PCA(n_components=n_components)
+            transformed = pca.fit_transform(loaded_array)
+            reconstructed = pca.inverse_transform(transformed)
 
-    # Plotting
-    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+            # Plotting
+            fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 
-    axs[0].imshow(loaded_array, cmap='gray')
-    axs[0].set_title("Original")
-    axs[0].axis('off')
+            axs[0].imshow(loaded_array, cmap='gray')
+            axs[0].set_title("Original")
+            axs[0].axis('off')
 
-    axs[1].imshow(reconstructed, cmap='gray')
-    axs[1].set_title(f"Reconstructed with {n_components} components")
-    axs[1].axis('off')
+            axs[1].imshow(reconstructed, cmap='gray')
+            axs[1].set_title(f"Reconstructed with {n_components} components")
+            axs[1].axis('off')
 
-    st.pyplot(fig)
+            st.pyplot(fig)
