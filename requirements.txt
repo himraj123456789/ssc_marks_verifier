@@ -1,5 +1,4 @@
 streamlit
-streamlit-drawable-canvas
 joblib
 pillow
 numpy
