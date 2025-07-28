@@ -1,6 +1,6 @@
 import streamlit as st
 import joblib
-import cv2
+from PIL import Image
 import numpy as np
 import urllib.request
 import os
@@ -23,14 +23,18 @@ model = joblib.load(model_path)
 uploaded_file = st.file_uploader("Upload an image (64x64)", type=["png", "jpg", "jpeg"])
 
 if uploaded_file is not None:
-    # Read and display image
-    file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-    img = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)
+    # Open image using PIL
+    img = Image.open(uploaded_file).convert("L")  # Convert to grayscale
     st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    # Step 3: Process Image (64x64 and binary)
-    img = cv2.resize(img, (64, 64))  # Ensure correct size
-    _, binary_img = cv2.threshold(img, 127, 1, cv2.THRESH_BINARY)
+    # Step 3: Resize and convert to binary (0/1)
+    img = img.resize((64, 64))
+    img_array = np.array(img)
+
+    # Convert grayscale to binary (threshold at 127)
+    binary_img = (img_array > 127).astype(int)
+
+    # Flatten the binary image into 4096 features
     input_data = binary_img.flatten().reshape(1, -1)
 
     # Step 4: Predict when button is pressed
