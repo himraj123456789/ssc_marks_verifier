@@ -1,43 +1,49 @@
 import streamlit as st
-import joblib
-from PIL import Image
-import numpy as np
-import urllib.request
-import os
+import string
 
-st.title("Image Classification using Pre-trained Model")
+# 26 emojis for 26 English letters
+emojis = [
+    "😀", "😁", "😂", "🤣", "😃", "😄",
+    "😅", "😆", "😉", "😊", "😋", "😎",
+    "😍", "😘", "🥰", "😗", "😙", "😚",
+    "🙂", "🤗", "🤩", "🤔", "🤨", "😐",
+    "😑", "😶"
+]
 
-# Step 1: Download model if not already present
-model_url = "https://github.com/himraj123456789/ssc_marks_verifier/raw/main/image_classifier.pkl"
-model_path = "image_classifier.pkl"
+# Create mapping dictionary
+letter_to_emoji = {letter: emoji for letter, emoji in zip(string.ascii_lowercase, emojis)}
+letter_to_emoji[" "] = " "  # space maps to space
+emoji_to_letter = {emoji: letter for letter, emoji in letter_to_emoji.items()}
 
-if not os.path.exists(model_path):
-    st.write("Downloading model...")
-    urllib.request.urlretrieve(model_url, model_path)
-    st.success("Model downloaded successfully!")
+# Encrypt function
+def encrypt(text: str) -> str:
+    return "".join(letter_to_emoji.get(ch.lower(), ch) for ch in text)
 
-# Load the model
-model = joblib.load(model_path)
+# Decrypt function
+def decrypt(emoji_text: str) -> str:
+    return "".join(emoji_to_letter.get(ch, ch) for ch in emoji_text)
 
-# Step 2: Upload image
-uploaded_file = st.file_uploader("Upload an image (64x64)", type=["png", "jpg", "jpeg"])
+# Streamlit App
+st.title("🔐 Emoji Encryptor & Decryptor")
 
-if uploaded_file is not None:
-    # Open image using PIL
-    img = Image.open(uploaded_file).convert("L")  # Convert to grayscale
-    st.image(img, caption="Uploaded Image", use_column_width=True)
+# Text input
+user_input = st.text_area("Enter your text or emoji message:")
 
-    # Step 3: Resize and convert to binary (0/1)
-    img = img.resize((64, 64))
-    img_array = np.array(img)
+# Buttons
+col1, col2 = st.columns(2)
 
-    # Convert grayscale to binary (threshold at 127)
-    binary_img = (img_array > 127).astype(int)
+with col1:
+    if st.button("Encrypt"):
+        if user_input.strip():
+            encrypted = encrypt(user_input)
+            st.success(f"🔒 Encrypted: {encrypted}")
+        else:
+            st.warning("⚠️ Please enter some text to encrypt.")
 
-    # Flatten the binary image into 4096 features
-    input_data = binary_img.flatten().reshape(1, -1)
-
-    # Step 4: Predict when button is pressed
-    if st.button("Predict"):
-        prediction = model.predict(input_data)
-        st.success(f"Predicted Label: **{prediction[0]}**")
+with col2:
+    if st.button("Decrypt"):
+        if user_input.strip():
+            decrypted = decrypt(user_input)
+            st.success(f"🔓 Decrypted: {decrypted}")
+        else:
+            st.warning("⚠️ Please enter some emoji text to decrypt.")
