@@ -1,49 +1,77 @@
 import streamlit as st
-import string
+import ascii_magic
+from bs4 import BeautifulSoup
+from PIL import Image
+import tempfile
+import os
+import uuid
+import streamlit.components.v1 as components
 
-# 26 emojis for 26 English letters
-emojis = [
-    "😀", "😁", "😂", "🤣", "😃", "😄",
-    "😅", "😆", "😉", "😊", "😋", "😎",
-    "😍", "😘", "🥰", "😗", "😙", "😚",
-    "🙂", "🤗", "🤩", "🤔", "🤨", "😐",
-    "😑", "😶"
-]
+st.set_page_config(page_title="Custom ASCII Art Generator", layout="centered")
 
-# Create mapping dictionary
-letter_to_emoji = {letter: emoji for letter, emoji in zip(string.ascii_lowercase, emojis)}
-letter_to_emoji[" "] = " "  # space maps to space
-emoji_to_letter = {emoji: letter for letter, emoji in letter_to_emoji.items()}
+st.title("🎨 Image → Custom ASCII Art with Colors")
+st.write("Upload an image, enter your custom text, and convert it into ASCII art (colors preserved).")
 
-# Encrypt function
-def encrypt(text: str) -> str:
-    return "".join(letter_to_emoji.get(ch.lower(), ch) for ch in text)
+# Sidebar options
+with st.sidebar:
+    st.header("Options")
+    columns = st.number_input("Columns (ASCII width)", min_value=10, max_value=1000, value=200, step=10)
+    width_ratio = st.number_input("Width ratio (height scaling)", min_value=0.1, max_value=5.0, value=2.0, step=0.1)
 
-# Decrypt function
-def decrypt(emoji_text: str) -> str:
-    return "".join(emoji_to_letter.get(ch, ch) for ch in emoji_text)
+# Input box for custom text
+custom_text = st.text_area(
+    "Enter the custom text to cycle through:",
+    "",
+    height=100
+)
 
-# Streamlit App
-st.title("🔐 Emoji Encryptor & Decryptor")
+# File uploader
+uploaded = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg", "bmp", "webp"])
 
-# Text input
-user_input = st.text_area("Enter your text or emoji message:")
+if uploaded:
+    img = Image.open(uploaded).convert("RGB")
+    st.image(img, caption="Uploaded Image", use_column_width=True)
 
-# Buttons
-col1, col2 = st.columns(2)
-
-with col1:
-    if st.button("Encrypt"):
-        if user_input.strip():
-            encrypted = encrypt(user_input)
-            st.success(f"🔒 Encrypted: {encrypted}")
+    if st.button("Generate ASCII Art"):
+        if not custom_text.strip():
+            st.error("Please enter some custom text before generating.")
         else:
-            st.warning("⚠️ Please enter some text to encrypt.")
+            with st.spinner("Generating ASCII art..."):
+                # Save uploaded image to a temp file
+                tmp_in = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}.png")
+                img.save(tmp_in)
 
-with col2:
-    if st.button("Decrypt"):
-        if user_input.strip():
-            decrypted = decrypt(user_input)
-            st.success(f"🔓 Decrypted: {decrypted}")
-        else:
-            st.warning("⚠️ Please enter some emoji text to decrypt.")
+                # Output temp file for ascii_magic
+                tmp_out = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}_ascii.html")
+
+                # Convert to ASCII HTML
+                art = ascii_magic.AsciiArt.from_image(tmp_in)
+                art.to_html_file(tmp_out, columns=columns, width_ratio=width_ratio)
+
+                # Read HTML
+                with open(tmp_out, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+
+                # Replace characters with custom text (cycled)
+                soup = BeautifulSoup(html_content, "html.parser")
+                chars = list(custom_text)
+                pr = 0
+                for span in soup.find_all("span"):
+                    if span.string:
+                        span.string.replace_with(chars[pr])
+                        pr = (pr + 1) % len(chars)
+
+                final_html = str(soup)
+
+                # Preview inside Streamlit
+                components.html(final_html, height=600, scrolling=True)
+
+                # Download button
+                st.download_button(
+                    label="Download index.html",
+                    data=final_html.encode("utf-8"),
+                    file_name="index.html",
+                    mime="text/html"
+                )
+
+                st.success("✅ Done! Preview above and download with the button.")
